@@ -1,0 +1,6 @@
+{
+  "name": "Crypto SL-Distance Reference Chart",
+  "description": "Fast, persistent reference chart and position size calculator for cryptocurrency traders using TradingView stop-loss distances.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

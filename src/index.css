@@ -1,0 +1,72 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --mac-bg: #f5f5f7;
+  --mac-surface: #ffffff;
+  --mac-border: rgba(0, 0, 0, 0.08);
+  --mac-border-subtle: rgba(0, 0, 0, 0.04);
+  --mac-accent: #0071e3;
+  --mac-green: #34c759;
+  --mac-red: #ff3b30;
+}
+
+.dark {
+  --mac-bg: #000000;
+  --mac-surface: #1c1c1e;
+  --mac-border: rgba(255, 255, 255, 0.12);
+  --mac-border-subtle: rgba(255, 255, 255, 0.06);
+  --mac-accent: #0a84ff;
+  --mac-green: #30d158;
+  --mac-red: #ff453a;
+  color-scheme: dark;
+}
+
+html {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  background-color: var(--mac-bg);
+  color: #1d1d1f;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.dark body {
+  background-color: #000000;
+  color: #f5f5f7;
+}
+
+.font-mono, code, pre, .tabular-nums {
+  font-family: "SF Mono", Monaco, Menlo, Consolas, "JetBrains Mono", monospace;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+/* Apple macOS / iOS style subtle scrollbars */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 9999px;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.35);
+}
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.35);
+}
