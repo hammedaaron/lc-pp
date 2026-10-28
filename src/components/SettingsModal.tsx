@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { CoinConfig, TableRowData } from '../types';
 import { exportTableToCsv, downloadFile } from '../utils/storage';
 import { 
@@ -75,8 +75,16 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     reader.readAsText(file);
   };
 
+  const [entryPriceStr, setEntryPriceStr] = useState<string>(() =>
+    activeCoin.entryPrice != null ? activeCoin.entryPrice.toString() : ''
+  );
+
+  useEffect(() => {
+    setEntryPriceStr(activeCoin.entryPrice != null ? activeCoin.entryPrice.toString() : '');
+  }, [activeCoin.id, activeCoin.entryPrice]);
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 dark:bg-black/70 backdrop-blur-sm p-4 select-none">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 dark:bg-black/70 backdrop-blur-sm p-4">
       <div className="bg-white dark:bg-[#1c1c1e] border border-black/[0.1] dark:border-white/[0.1] rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-150 max-h-[90vh] flex flex-col">
         {/* Header */}
         <div className="px-4 py-3 border-b border-black/[0.06] dark:border-white/[0.08] flex items-center justify-between bg-[#fbfbfd] dark:bg-[#252528]">
@@ -156,14 +164,21 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               </label>
               <div className="relative">
                 <input
-                  type="number"
-                  step="any"
-                  value={activeCoin.entryPrice || ''}
-                  onChange={(e) => onUpdateCoin({ entryPrice: parseFloat(e.target.value) || 0 })}
+                  type="text"
+                  inputMode="decimal"
+                  value={entryPriceStr}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setEntryPriceStr(val);
+                    const parsed = parseFloat(val);
+                    if (!isNaN(parsed) && parsed > 0) {
+                      onUpdateCoin({ entryPrice: parsed });
+                    }
+                  }}
                   placeholder="e.g. 68500"
                   className="w-full px-2.5 py-1.5 bg-white dark:bg-[#1c1c1e] border border-black/[0.12] dark:border-white/[0.15] rounded-md font-mono text-sm focus:outline-none focus:border-[#0071e3] dark:focus:border-[#0a84ff]"
                 />
-                <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs font-mono text-[#86868b]">
+                <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs font-mono text-[#86868b] pointer-events-none">
                   USDT
                 </span>
               </div>

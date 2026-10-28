@@ -37,7 +37,7 @@ export const ReferenceTable: React.FC<ReferenceTableProps> = ({
   const selectedRow = rows.find((r) => r.distanceValue === highlightedDistance);
 
   return (
-    <div className="bg-white dark:bg-[#1c1c1e] border border-black/[0.08] dark:border-white/[0.08] rounded-2xl shadow-xs overflow-hidden select-none transition-colors">
+    <div className="bg-white dark:bg-[#1c1c1e] border border-black/[0.08] dark:border-white/[0.08] rounded-2xl shadow-xs overflow-hidden transition-colors">
       {/* Table Toolbar */}
       <div className="px-3.5 sm:px-4 py-2.5 bg-[#fbfbfd] dark:bg-[#252528] border-b border-black/[0.06] dark:border-white/[0.06] flex items-center justify-between gap-2">
         <div className="flex items-center gap-1.5">

@@ -86,7 +86,7 @@ export default function App() {
     setCoins((prevCoins) => {
       const now = new Date().toISOString();
       const updated = prevCoins.map((coin) => {
-        if (coin.id === activeCoin.id) {
+        if (coin.id === activeCoinId) {
           return {
             ...coin,
             ...changes,
@@ -101,16 +101,16 @@ export default function App() {
         persistCoins(updated);
         setUnsavedCoinIds((prev) => {
           const next = new Set(prev);
-          next.delete(activeCoin.id);
+          next.delete(activeCoinId);
           return next;
         });
       } else {
-        setUnsavedCoinIds((prev) => new Set(prev).add(activeCoin.id));
+        setUnsavedCoinIds((prev) => new Set(prev).add(activeCoinId));
       }
 
       return updated;
     });
-  }, [activeCoin.id, autoSaveEnabled, persistCoins]);
+  }, [activeCoinId, autoSaveEnabled, persistCoins]);
 
   // Manual save handler
   const handleManualSave = useCallback(() => {

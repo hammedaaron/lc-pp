@@ -33,7 +33,7 @@ export const CoinListSidebar: React.FC<CoinListSidebarProps> = ({
   });
 
   return (
-    <aside className="w-full h-full bg-[#fbfbfd] dark:bg-[#1c1c1e] border-r border-black/[0.08] dark:border-white/[0.08] flex flex-col select-none transition-colors">
+    <aside className="w-full h-full bg-[#fbfbfd] dark:bg-[#1c1c1e] border-r border-black/[0.08] dark:border-white/[0.08] flex flex-col transition-colors">
       {/* Top Header: Watchlist Title & Add Coin */}
       <div className="p-3 border-b border-black/[0.06] dark:border-white/[0.06] flex items-center justify-between shrink-0">
         <div className="flex items-center gap-1.5">
