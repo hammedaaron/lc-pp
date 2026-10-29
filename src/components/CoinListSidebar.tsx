@@ -35,7 +35,7 @@ export const CoinListSidebar: React.FC<CoinListSidebarProps> = ({
   return (
     <aside className="w-full h-full bg-[#fbfbfd] dark:bg-[#1c1c1e] border-r border-black/[0.08] dark:border-white/[0.08] flex flex-col transition-colors">
       {/* Top Header: Watchlist Title & Add Coin */}
-      <div className="p-3 border-b border-black/[0.06] dark:border-white/[0.06] flex items-center justify-between shrink-0">
+      <div className="px-3 pb-3 pt-[max(calc(env(safe-area-inset-top,0px)+8px),14px)] lg:pt-3 border-b border-black/[0.06] dark:border-white/[0.06] flex items-center justify-between shrink-0 safe-top-header">
         <div className="flex items-center gap-1.5">
           <span className="text-xs font-semibold text-[#1d1d1f] dark:text-white uppercase tracking-wider text-[11px]">
             Watchlist ({coins.length})
@@ -86,7 +86,7 @@ export const CoinListSidebar: React.FC<CoinListSidebarProps> = ({
       </div>
 
       {/* Vertical Coin Items List - Always Scales Vertically */}
-      <div className="flex flex-col overflow-y-auto flex-1 p-2 gap-1 w-full">
+      <div className="flex flex-col overflow-y-auto flex-1 p-2 pb-[max(calc(env(safe-area-inset-bottom,0px)+12px),16px)] gap-1 w-full">
         {filteredCoins.length === 0 ? (
           <div className="py-8 text-center text-xs text-[#86868b] w-full">
             No matching coins

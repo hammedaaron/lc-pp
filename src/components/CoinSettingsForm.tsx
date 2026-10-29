@@ -6,12 +6,14 @@ interface CoinSettingsFormProps {
   coin: CoinConfig;
   onChange: (updated: Partial<CoinConfig>) => void;
   onRegenerate: () => void;
+  onDirectionChange?: (direction: 'long' | 'short') => void;
 }
 
 export const CoinSettingsForm: React.FC<CoinSettingsFormProps> = ({
   coin,
   onChange,
   onRegenerate,
+  onDirectionChange,
 }) => {
   const [showRangeControls, setShowRangeControls] = useState(false);
 
@@ -36,7 +38,7 @@ export const CoinSettingsForm: React.FC<CoinSettingsFormProps> = ({
     coin.stepDistance != null ? coin.stepDistance.toString() : ''
   );
 
-  // Synchronize local string states when active coin ID or external configuration changes
+  // Synchronize local string states when active coin ID, direction, unit, or values change
   useEffect(() => {
     setRefDistanceStr(coin.refDistance != null ? coin.refDistance.toString() : '');
     setRefQuantityStr(coin.refQuantity != null ? coin.refQuantity.toString() : '');
@@ -44,7 +46,7 @@ export const CoinSettingsForm: React.FC<CoinSettingsFormProps> = ({
     setMinDistStr(coin.minDistance != null ? coin.minDistance.toString() : '');
     setMaxDistStr(coin.maxDistance != null ? coin.maxDistance.toString() : '');
     setStepDistStr(coin.stepDistance != null ? coin.stepDistance.toString() : '');
-  }, [coin.id, coin.distanceUnit]);
+  }, [coin.id, coin.direction, coin.distanceUnit, coin.refDistance, coin.refQuantity, coin.leverage]);
 
   // Handlers for inputs
   const handleDistanceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -161,12 +163,40 @@ export const CoinSettingsForm: React.FC<CoinSettingsFormProps> = ({
     <div className="bg-white dark:bg-[#1c1c1e] border border-black/[0.08] dark:border-white/[0.08] rounded-2xl shadow-xs p-3.5 sm:p-4 mb-3 sm:mb-4 transition-colors">
       {/* Top Bar: Unit Segmented Control & Range Toggle */}
       <div className="flex items-center justify-between pb-2.5 mb-2.5 border-b border-black/[0.06] dark:border-white/[0.06]">
-        {/* Direction Indicator */}
-        <div className="flex items-center gap-1.5">
+        {/* Direction Indicator & Clickable Long / Short Selector */}
+        <div className="flex items-center gap-1.5 sm:gap-2">
           <span className="text-xs font-semibold text-[#1d1d1f] dark:text-white">
-            {coin.name} Position
+            {coin.name}
           </span>
-          <span className="text-[10px] font-mono text-[#86868b] dark:text-[#98989d]">
+          <div className="inline-flex p-0.5 bg-black/[0.05] dark:bg-white/[0.08] rounded-lg">
+            <button
+              type="button"
+              onClick={() => onDirectionChange?.('long')}
+              className={`px-2 sm:px-2.5 py-0.5 sm:py-1 text-[10px] sm:text-xs font-bold rounded-md transition-all cursor-pointer ${
+                coin.direction === 'long'
+                  ? 'bg-[#34c759] text-white shadow-2xs'
+                  : 'text-[#6e6e73] dark:text-[#98989d] hover:text-[#248a3d] dark:hover:text-[#30d158]'
+              }`}
+              title="Switch to Long relativity values"
+              aria-label="Long Position"
+            >
+              LONG
+            </button>
+            <button
+              type="button"
+              onClick={() => onDirectionChange?.('short')}
+              className={`px-2 sm:px-2.5 py-0.5 sm:py-1 text-[10px] sm:text-xs font-bold rounded-md transition-all cursor-pointer ${
+                coin.direction === 'short'
+                  ? 'bg-[#ff3b30] text-white shadow-2xs'
+                  : 'text-[#6e6e73] dark:text-[#98989d] hover:text-[#d70015] dark:hover:text-[#ff453a]'
+              }`}
+              title="Switch to Short relativity values"
+              aria-label="Short Position"
+            >
+              SHORT
+            </button>
+          </div>
+          <span className="text-[10px] font-mono text-[#86868b] dark:text-[#98989d] hidden md:inline">
             · Linear USDT
           </span>
         </div>

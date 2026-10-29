@@ -87,15 +87,116 @@ export default function App() {
     saveCoinsToStorage(updatedCoins);
   }, []);
 
-  // Handle updates to the active coin
+  // Handle updates to the active coin and keep direction-specific relativity in sync
   const handleUpdateActiveCoin = useCallback((changes: Partial<CoinConfig>) => {
     setCoins((prevCoins) => {
       const now = new Date().toISOString();
       const updated = prevCoins.map((coin) => {
         if (coin.id === activeCoinId) {
-          return {
+          const nextCoin: CoinConfig = {
             ...coin,
             ...changes,
+            updatedAt: now,
+            lastSavedAt: autoSaveEnabled ? now : coin.lastSavedAt,
+          };
+
+          // Synchronize relativity values to the active direction's saved config
+          const activeDir = nextCoin.direction;
+          const currentRelativitySnapshot = {
+            refDistance: nextCoin.refDistance,
+            refQuantity: nextCoin.refQuantity,
+            entryPrice: nextCoin.entryPrice,
+            leverage: nextCoin.leverage,
+            minDistance: nextCoin.minDistance,
+            maxDistance: nextCoin.maxDistance,
+            stepDistance: nextCoin.stepDistance,
+            distanceUnit: nextCoin.distanceUnit,
+            riskUsdt: nextCoin.riskUsdt,
+            calculationMode: nextCoin.calculationMode,
+            pinnedDistances: nextCoin.pinnedDistances || [],
+          };
+
+          if (activeDir === 'long') {
+            nextCoin.longConfig = {
+              ...(nextCoin.longConfig || {}),
+              ...currentRelativitySnapshot,
+            };
+          } else {
+            nextCoin.shortConfig = {
+              ...(nextCoin.shortConfig || {}),
+              ...currentRelativitySnapshot,
+            };
+          }
+
+          return nextCoin;
+        }
+        return coin;
+      });
+
+      if (autoSaveEnabled) {
+        persistCoins(updated);
+        setUnsavedCoinIds((prev) => {
+          const next = new Set(prev);
+          next.delete(activeCoinId);
+          return next;
+        });
+      } else {
+        setUnsavedCoinIds((prev) => new Set(prev).add(activeCoinId));
+      }
+
+      return updated;
+    });
+  }, [activeCoinId, autoSaveEnabled, persistCoins]);
+
+  // Handle switching direction between Long and Short seamlessly
+  const handleDirectionChange = useCallback((newDirection: 'long' | 'short') => {
+    setCoins((prevCoins) => {
+      const now = new Date().toISOString();
+      const updated = prevCoins.map((coin) => {
+        if (coin.id === activeCoinId) {
+          if (coin.direction === newDirection) return coin;
+
+          // 1. Snapshot current relativity values into current direction config
+          const currentSnapshot = {
+            refDistance: coin.refDistance,
+            refQuantity: coin.refQuantity,
+            entryPrice: coin.entryPrice,
+            leverage: coin.leverage,
+            minDistance: coin.minDistance,
+            maxDistance: coin.maxDistance,
+            stepDistance: coin.stepDistance,
+            distanceUnit: coin.distanceUnit,
+            riskUsdt: coin.riskUsdt,
+            calculationMode: coin.calculationMode,
+            pinnedDistances: coin.pinnedDistances || [],
+          };
+
+          const longConfig = coin.direction === 'long' 
+            ? currentSnapshot 
+            : (coin.longConfig || currentSnapshot);
+          const shortConfig = coin.direction === 'short' 
+            ? currentSnapshot 
+            : (coin.shortConfig || currentSnapshot);
+
+          // 2. Load the target direction's saved values
+          const targetConfig = newDirection === 'long' ? longConfig : shortConfig;
+
+          return {
+            ...coin,
+            direction: newDirection,
+            refDistance: targetConfig.refDistance ?? coin.refDistance,
+            refQuantity: targetConfig.refQuantity ?? coin.refQuantity,
+            entryPrice: targetConfig.entryPrice ?? coin.entryPrice,
+            leverage: targetConfig.leverage ?? coin.leverage,
+            minDistance: targetConfig.minDistance ?? coin.minDistance,
+            maxDistance: targetConfig.maxDistance ?? coin.maxDistance,
+            stepDistance: targetConfig.stepDistance ?? coin.stepDistance,
+            distanceUnit: targetConfig.distanceUnit ?? coin.distanceUnit,
+            riskUsdt: targetConfig.riskUsdt ?? coin.riskUsdt,
+            calculationMode: targetConfig.calculationMode ?? coin.calculationMode,
+            pinnedDistances: targetConfig.pinnedDistances ?? coin.pinnedDistances ?? [],
+            longConfig,
+            shortConfig,
             updatedAt: now,
             lastSavedAt: autoSaveEnabled ? now : coin.lastSavedAt,
           };
@@ -117,6 +218,20 @@ export default function App() {
       return updated;
     });
   }, [activeCoinId, autoSaveEnabled, persistCoins]);
+
+  // Handle toggling pin on a distance value
+  const handleTogglePin = useCallback((distanceValue: number) => {
+    if (!activeCoin) return;
+    const currentPinned = activeCoin.pinnedDistances || [];
+    const exists = currentPinned.some((d) => Math.abs(d - distanceValue) < 0.000001);
+    let nextPinned: number[];
+    if (exists) {
+      nextPinned = currentPinned.filter((d) => Math.abs(d - distanceValue) >= 0.000001);
+    } else {
+      nextPinned = [...currentPinned, distanceValue].sort((a, b) => a - b);
+    }
+    handleUpdateActiveCoin({ pinnedDistances: nextPinned });
+  }, [activeCoin, handleUpdateActiveCoin]);
 
   // Manual save handler
   const handleManualSave = useCallback(() => {
@@ -251,7 +366,7 @@ export default function App() {
       {/* Offline Status Notice */}
       <OfflineIndicator />
 
-      {/* Uncluttered Header */}
+      {/* Uncluttered Header with clickable Long/Short toggle */}
       <Header
         activeCoin={activeCoin}
         hasUnsavedChanges={hasUnsavedChanges}
@@ -264,6 +379,7 @@ export default function App() {
         isInstallable={isInstallable}
         isInstalled={isInstalled}
         onPromptInstall={promptInstall}
+        onDirectionChange={handleDirectionChange}
       />
 
       {/* Main Container */}
@@ -279,9 +395,9 @@ export default function App() {
         {/* Source List Sidebar (Desktop or Mobile Slide-Over Drawer) */}
         <div
           className={`
-            fixed lg:static top-12 bottom-0 left-0 z-40 lg:z-auto transition-transform duration-200 ease-in-out
+            fixed lg:static inset-y-0 left-0 z-50 lg:z-auto transition-transform duration-200 ease-in-out
             ${sidebarOpen ? 'translate-x-0 shadow-2xl lg:shadow-none' : '-translate-x-full lg:translate-x-0'}
-            lg:block w-72 sm:w-80 lg:w-64 max-w-[85vw] h-[calc(100vh-48px)] lg:h-auto lg:self-stretch shrink-0
+            lg:block w-72 sm:w-80 lg:w-64 max-w-[85vw] h-full lg:h-auto lg:self-stretch shrink-0
           `}
         >
           <CoinListSidebar
@@ -302,17 +418,19 @@ export default function App() {
 
         {/* Content Viewport */}
         <main className="flex-1 p-2.5 sm:p-4 lg:p-6 min-w-0 overflow-y-auto">
-          {/* Inputs Section (Reference SL Distance, Reference Quantity, Leverage) */}
+          {/* Inputs Section (Reference SL Distance, Reference Quantity, Leverage, Direction) */}
           <CoinSettingsForm
             coin={activeCoin}
             onChange={handleUpdateActiveCoin}
             onRegenerate={handleRegenerate}
+            onDirectionChange={handleDirectionChange}
           />
 
-          {/* Reference Matrix Table (3 Columns: SL Distance, Quantity, Margin @ Leverage) */}
+          {/* Reference Matrix Table with Pinning and 3 Columns */}
           <ReferenceTable
             coin={activeCoin}
             rows={tableRows}
+            onTogglePin={handleTogglePin}
           />
         </main>
       </div>

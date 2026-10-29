@@ -18,7 +18,7 @@ export const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
   if (!isOpen || !coin) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 dark:bg-black/70 backdrop-blur-sm p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 dark:bg-black/70 backdrop-blur-sm p-4 pt-[max(calc(env(safe-area-inset-top,0px)+12px),16px)] pb-[max(calc(env(safe-area-inset-bottom,0px)+12px),16px)]">
       <div className="bg-white dark:bg-[#1c1c1e] border border-black/[0.1] dark:border-white/[0.1] rounded-2xl shadow-2xl w-full max-w-xs overflow-hidden animate-in fade-in zoom-in-95 duration-150 p-5 text-center">
         <div className="w-9 h-9 rounded-full bg-[#ff3b30]/10 dark:bg-[#ff453a]/20 text-[#ff3b30] dark:text-[#ff453a] flex items-center justify-center mx-auto mb-2.5">
           <AlertTriangle className="w-4 h-4" />

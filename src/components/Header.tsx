@@ -15,6 +15,7 @@ interface HeaderProps {
   isInstallable?: boolean;
   onPromptInstall?: () => void;
   isInstalled?: boolean;
+  onDirectionChange?: (direction: 'long' | 'short') => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -29,10 +30,11 @@ export const Header: React.FC<HeaderProps> = ({
   isInstallable = false,
   onPromptInstall,
   isInstalled = false,
+  onDirectionChange,
 }) => {
   return (
-    <header className="bg-[#fbfbfd]/90 dark:bg-[#1c1c1e]/90 backdrop-blur-md border-b border-black/[0.08] dark:border-white/[0.08] sticky top-0 z-30">
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 h-12 flex items-center justify-between gap-2">
+    <header className="bg-[#fbfbfd]/90 dark:bg-[#1c1c1e]/90 backdrop-blur-md border-b border-black/[0.08] dark:border-white/[0.08] sticky top-0 z-30 transition-all safe-top-header pt-[max(calc(env(safe-area-inset-top,0px)+8px),14px)] lg:pt-0">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 min-h-[48px] h-12 flex items-center justify-between gap-2">
         {/* Left: Window Controls, FX Logo & Coin Identity */}
         <div className="flex items-center gap-2 sm:gap-3">
           {/* macOS Window dots (desktop only) */}
@@ -63,20 +65,39 @@ export const Header: React.FC<HeaderProps> = ({
             </span>
           </button>
 
-          {/* Active Coin Badge */}
-          <div className="flex items-center gap-1.5">
-            <span className="text-[11px] font-mono text-[#86868b] dark:text-[#98989d] hidden sm:inline">
-              {activeCoin.pair}
-            </span>
-            <span
-              className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
+          {/* Active Coin Pair Label */}
+          <span className="text-[11px] font-mono text-[#86868b] dark:text-[#98989d] hidden sm:inline">
+            {activeCoin.pair}
+          </span>
+
+          {/* Clickable Direction Selector: Long and Short toggle */}
+          <div className="inline-flex p-0.5 bg-black/[0.06] dark:bg-white/[0.08] rounded-lg items-center shadow-2xs">
+            <button
+              type="button"
+              onClick={() => onDirectionChange?.('long')}
+              className={`px-2 py-0.5 text-[10px] font-bold rounded-md transition-all cursor-pointer ${
                 activeCoin.direction === 'long'
-                  ? 'bg-[#34c759]/10 text-[#248a3d] dark:text-[#30d158]'
-                  : 'bg-[#ff3b30]/10 text-[#d70015] dark:text-[#ff453a]'
+                  ? 'bg-[#34c759] text-white shadow-2xs'
+                  : 'text-[#6e6e73] dark:text-[#98989d] hover:text-[#248a3d] dark:hover:text-[#30d158]'
               }`}
+              title="Click to view/save Long relativity values"
+              aria-label="Long Position"
             >
-              {activeCoin.direction.toUpperCase()}
-            </span>
+              LONG
+            </button>
+            <button
+              type="button"
+              onClick={() => onDirectionChange?.('short')}
+              className={`px-2 py-0.5 text-[10px] font-bold rounded-md transition-all cursor-pointer ${
+                activeCoin.direction === 'short'
+                  ? 'bg-[#ff3b30] text-white shadow-2xs'
+                  : 'text-[#6e6e73] dark:text-[#98989d] hover:text-[#d70015] dark:hover:text-[#ff453a]'
+              }`}
+              title="Click to view/save Short relativity values"
+              aria-label="Short Position"
+            >
+              SHORT
+            </button>
           </div>
         </div>
 

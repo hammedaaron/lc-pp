@@ -6,17 +6,32 @@ import { Copy, Check, Search, Pin, AlertTriangle, X } from 'lucide-react';
 interface ReferenceTableProps {
   coin: CoinConfig;
   rows: TableRowData[];
+  onTogglePin?: (distanceValue: number) => void;
 }
 
 export const ReferenceTable: React.FC<ReferenceTableProps> = ({
   coin,
   rows,
+  onTogglePin,
 }) => {
   const [highlightedDistance, setHighlightedDistance] = useState<number | null>(null);
   const [filterQuery, setFilterQuery] = useState('');
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
+  const [viewTab, setViewTab] = useState<'all' | 'pinned'>('all');
+
+  const pinnedSet = new Set(
+    (coin.pinnedDistances || []).map((d) => Number(d.toFixed(6)))
+  );
+
+  const isRowPinned = (val: number) => {
+    const rounded = Number(val.toFixed(6));
+    return pinnedSet.has(rounded);
+  };
 
   const filteredRows = rows.filter((r) => {
+    if (viewTab === 'pinned' && !isRowPinned(r.distanceValue)) {
+      return false;
+    }
     if (!filterQuery.trim()) return true;
     const q = filterQuery.toLowerCase().trim();
     return (
@@ -25,6 +40,9 @@ export const ReferenceTable: React.FC<ReferenceTableProps> = ({
       r.formattedQuantity.includes(q)
     );
   });
+
+  // Split into pinned and unpinned if viewing 'all' and there are pinned items
+  const pinnedRows = rows.filter((r) => isRowPinned(r.distanceValue));
 
   const handleCopy = (text: string, key: string) => {
     navigator.clipboard.writeText(text);
@@ -39,18 +57,42 @@ export const ReferenceTable: React.FC<ReferenceTableProps> = ({
   return (
     <div className="bg-white dark:bg-[#1c1c1e] border border-black/[0.08] dark:border-white/[0.08] rounded-2xl shadow-xs overflow-hidden transition-colors">
       {/* Table Toolbar */}
-      <div className="px-3.5 sm:px-4 py-2.5 bg-[#fbfbfd] dark:bg-[#252528] border-b border-black/[0.06] dark:border-white/[0.06] flex items-center justify-between gap-2">
-        <div className="flex items-center gap-1.5">
+      <div className="px-3.5 sm:px-4 py-2.5 bg-[#fbfbfd] dark:bg-[#252528] border-b border-black/[0.06] dark:border-white/[0.06] flex flex-wrap items-center justify-between gap-2">
+        <div className="flex items-center gap-2">
           <span className="text-xs font-semibold text-[#1d1d1f] dark:text-white">
             Matrix
           </span>
-          <span className="text-[11px] font-mono text-[#86868b] dark:text-[#98989d]">
-            ({rows.length})
-          </span>
+
+          {/* View Tab: All vs Pinned Only */}
+          <div className="inline-flex p-0.5 bg-black/[0.05] dark:bg-white/[0.08] rounded-lg">
+            <button
+              type="button"
+              onClick={() => setViewTab('all')}
+              className={`px-2 py-0.5 text-[11px] font-medium rounded-md transition-all ${
+                viewTab === 'all'
+                  ? 'bg-white dark:bg-[#2c2c2e] text-[#1d1d1f] dark:text-white shadow-2xs font-semibold'
+                  : 'text-[#6e6e73] dark:text-[#98989d] hover:text-[#1d1d1f] dark:hover:text-white'
+              }`}
+            >
+              All ({rows.length})
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewTab('pinned')}
+              className={`px-2 py-0.5 text-[11px] font-medium rounded-md transition-all inline-flex items-center gap-1 ${
+                viewTab === 'pinned'
+                  ? 'bg-white dark:bg-[#2c2c2e] text-[#0071e3] dark:text-[#0a84ff] shadow-2xs font-semibold'
+                  : 'text-[#6e6e73] dark:text-[#98989d] hover:text-[#1d1d1f] dark:hover:text-white'
+              }`}
+            >
+              <Pin className="w-3 h-3 fill-current" />
+              <span>Pinned ({pinnedRows.length})</span>
+            </button>
+          </div>
         </div>
 
         {/* Filter input */}
-        <div className="relative w-44 sm:w-56">
+        <div className="relative w-40 sm:w-56">
           <Search className="w-3.5 h-3.5 text-[#86868b] absolute left-2.5 top-1/2 -translate-y-1/2" />
           <input
             type="text"
@@ -104,6 +146,15 @@ export const ReferenceTable: React.FC<ReferenceTableProps> = ({
             )}
 
             <button
+              onClick={() => onTogglePin?.(selectedRow.distanceValue)}
+              className="px-2.5 py-1 bg-white dark:bg-[#2c2c2e] border border-black/[0.1] dark:border-white/[0.15] text-[#1d1d1f] dark:text-white hover:bg-black/5 rounded-md text-[11px] font-sans font-medium transition-colors inline-flex items-center gap-1 shadow-2xs min-h-[30px]"
+              title={isRowPinned(selectedRow.distanceValue) ? 'Unpin target' : 'Pin target'}
+            >
+              <Pin className={`w-3 h-3 ${isRowPinned(selectedRow.distanceValue) ? 'fill-current text-[#0071e3] dark:text-[#0a84ff]' : ''}`} />
+              <span>{isRowPinned(selectedRow.distanceValue) ? 'Pinned' : 'Pin'}</span>
+            </button>
+
+            <button
               onClick={() => setHighlightedDistance(null)}
               className="p-1 text-[#86868b] hover:text-[#1d1d1f] dark:hover:text-white"
               title="Deselect"
@@ -119,19 +170,19 @@ export const ReferenceTable: React.FC<ReferenceTableProps> = ({
         <table className="w-full text-xs text-left border-collapse">
           <thead className="bg-[#fbfbfd] dark:bg-[#252528] text-[#6e6e73] dark:text-[#98989d] font-medium text-[11px] sticky top-0 z-10 border-b border-black/[0.08] dark:border-white/[0.08]">
             <tr>
-              <th className="py-2.5 px-3 sm:px-4 text-left w-1/3">
+              <th className="py-2.5 px-3 sm:px-4 text-left w-2/5">
                 1. SL Distance
                 <span className="ml-1 text-[10px] text-[#86868b] dark:text-[#6e6e73]">
                   ({coin.distanceUnit === 'percentage' ? '%' : 'dec'})
                 </span>
               </th>
-              <th className="py-2.5 px-3 sm:px-4 text-right w-1/3">
+              <th className="py-2.5 px-3 sm:px-4 text-right w-[30%]">
                 2. Quantity
                 <span className="ml-1 text-[10px] text-[#86868b] dark:text-[#6e6e73]">
                   ({coin.name})
                 </span>
               </th>
-              <th className="py-2.5 px-3 sm:px-4 text-right w-1/3">
+              <th className="py-2.5 px-3 sm:px-4 text-right w-[30%]">
                 3. Margin @ {coin.leverage}x
                 <span className="ml-1 text-[10px] text-[#86868b] dark:text-[#6e6e73]">
                   ($)
@@ -147,12 +198,13 @@ export const ReferenceTable: React.FC<ReferenceTableProps> = ({
                   colSpan={3}
                   className="py-12 text-center text-[#86868b] font-sans"
                 >
-                  No matching SL distances
+                  {viewTab === 'pinned' ? 'No pinned SL values yet. Click the pin icon next to any SL distance to pin it!' : 'No matching SL distances'}
                 </td>
               </tr>
             ) : (
               filteredRows.map((row) => {
                 const isSelected = row.distanceValue === highlightedDistance;
+                const isPinned = isRowPinned(row.distanceValue);
                 const qtyKey = `qty-${row.distanceValue}`;
                 const marginKey = `margin-${row.distanceValue}`;
 
@@ -160,19 +212,46 @@ export const ReferenceTable: React.FC<ReferenceTableProps> = ({
                   <tr
                     key={row.distanceValue}
                     onClick={() => setHighlightedDistance(isSelected ? null : row.distanceValue)}
-                    className={`cursor-pointer transition-colors active:bg-black/[0.05] dark:active:bg-white/[0.05] ${
+                    className={`cursor-pointer transition-colors active:bg-black/[0.05] dark:active:bg-white/[0.05] group ${
                       isSelected
                         ? 'bg-[#0071e3]/[0.08] dark:bg-[#0a84ff]/[0.15] hover:bg-[#0071e3]/[0.12]'
+                        : isPinned
+                        ? 'bg-amber-500/[0.04] dark:bg-amber-400/[0.06] hover:bg-amber-500/[0.08]'
                         : 'hover:bg-black/[0.015] dark:hover:bg-white/[0.02]'
                     }`}
                   >
-                    {/* 1. SL Distance */}
+                    {/* 1. SL Distance with Clickable Pin */}
                     <td className="py-2.5 sm:py-2 px-3 sm:px-4 font-semibold text-[#1d1d1f] dark:text-white whitespace-nowrap">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1.5 sm:gap-2">
+                        {/* Pin Toggle Button */}
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onTogglePin?.(row.distanceValue);
+                          }}
+                          className={`p-1 rounded-md transition-all cursor-pointer ${
+                            isPinned
+                              ? 'text-[#0071e3] dark:text-[#0a84ff] bg-[#0071e3]/10 dark:bg-[#0a84ff]/20'
+                              : 'text-[#86868b] opacity-30 hover:opacity-100 hover:bg-black/5 dark:hover:bg-white/10'
+                          }`}
+                          title={isPinned ? 'Unpin this value' : 'Pin this value'}
+                          aria-label={isPinned ? 'Unpin value' : 'Pin value'}
+                        >
+                          <Pin className={`w-3.5 h-3.5 ${isPinned ? 'fill-current' : ''}`} />
+                        </button>
+
                         {isSelected && (
                           <span className="w-1.5 h-1.5 rounded-full bg-[#0071e3] dark:bg-[#0a84ff]" />
                         )}
-                        <span>{row.formattedDistance}</span>
+
+                        <span className="text-sm">{row.formattedDistance}</span>
+
+                        {isPinned && (
+                          <span className="text-[9px] uppercase tracking-wider font-sans font-bold px-1.5 py-0.2 rounded bg-[#0071e3]/10 dark:bg-[#0a84ff]/20 text-[#0071e3] dark:text-[#0a84ff] hidden sm:inline">
+                            Pinned
+                          </span>
+                        )}
                       </div>
                     </td>
 

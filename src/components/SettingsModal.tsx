@@ -94,7 +94,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   }, [activeCoin.id, activeCoin.entryPrice]);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 dark:bg-black/70 backdrop-blur-sm p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 dark:bg-black/70 backdrop-blur-sm p-4 pt-[max(calc(env(safe-area-inset-top,0px)+12px),16px)] pb-[max(calc(env(safe-area-inset-bottom,0px)+12px),16px)]">
       <div className="bg-white dark:bg-[#1c1c1e] border border-black/[0.1] dark:border-white/[0.1] rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-150 max-h-[90vh] flex flex-col">
         {/* Header */}
         <div className="px-4 py-3 border-b border-black/[0.06] dark:border-white/[0.08] flex items-center justify-between bg-[#fbfbfd] dark:bg-[#252528]">

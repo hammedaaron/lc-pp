@@ -43,6 +43,21 @@ export const INITIAL_COINS: CoinConfig[] = [
       { id: 'lev-btc-4', leverage: 50, maxSize: '7.30', unit: 'coins', notes: '50x tier' },
       { id: 'lev-btc-5', leverage: 100, maxSize: '14.60', unit: 'coins', notes: '100x max' },
     ],
+    pinnedDistances: [0.01, 0.02, 0.05],
+    longConfig: {
+      refDistance: 0.02,
+      refQuantity: 0.109,
+      entryPrice: 68500,
+      leverage: 10,
+      pinnedDistances: [0.01, 0.02, 0.05],
+    },
+    shortConfig: {
+      refDistance: 0.018,
+      refQuantity: 0.121,
+      entryPrice: 68500,
+      leverage: 10,
+      pinnedDistances: [0.01, 0.02, 0.05],
+    },
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     lastSavedAt: new Date().toISOString(),
@@ -74,6 +89,21 @@ export const INITIAL_COINS: CoinConfig[] = [
       { id: 'lev-eth-3', leverage: 10, maxSize: '15', unit: 'coins', notes: 'Intraday setup' },
       { id: 'lev-eth-4', leverage: 20, maxSize: '7.5', unit: 'coins', notes: 'Tight scalp' },
     ],
+    pinnedDistances: [0.02, 0.05],
+    longConfig: {
+      refDistance: 0.025,
+      refQuantity: 1.5,
+      entryPrice: 2650,
+      leverage: 10,
+      pinnedDistances: [0.02, 0.05],
+    },
+    shortConfig: {
+      refDistance: 0.02,
+      refQuantity: 1.85,
+      entryPrice: 2650,
+      leverage: 10,
+      pinnedDistances: [0.02, 0.05],
+    },
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     lastSavedAt: new Date().toISOString(),
@@ -105,6 +135,21 @@ export const INITIAL_COINS: CoinConfig[] = [
       { id: 'lev-sol-3', leverage: 10, maxSize: '120', unit: 'coins', notes: 'Aggressive scalp' },
       { id: 'lev-sol-4', leverage: 20, maxSize: '50', unit: 'coins', notes: 'Low risk limit' },
     ],
+    pinnedDistances: [0.03, 0.05],
+    longConfig: {
+      refDistance: 0.03,
+      refQuantity: 13.69,
+      entryPrice: 182.5,
+      leverage: 10,
+      pinnedDistances: [0.03, 0.05],
+    },
+    shortConfig: {
+      refDistance: 0.025,
+      refQuantity: 16.42,
+      entryPrice: 182.5,
+      leverage: 10,
+      pinnedDistances: [0.03, 0.05],
+    },
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     lastSavedAt: new Date().toISOString(),
@@ -121,13 +166,43 @@ export function loadSavedCoins(): CoinConfig[] {
     const parsed = JSON.parse(raw);
     if (Array.isArray(parsed) && parsed.length > 0) {
       // Ensure missing keys are hydrated safely
-      return parsed.map((c: Partial<CoinConfig>) => ({
-        ...INITIAL_COINS[0],
-        ...c,
-        accountCapital: c.accountCapital ?? 10000,
-        maxMarginPercent: c.maxMarginPercent ?? 20,
-        leverageLimits: c.leverageLimits || DEFAULT_LEVERAGE_ENTRIES,
-      }));
+      return parsed.map((c: Partial<CoinConfig>) => {
+        const base = INITIAL_COINS[0];
+        const activeDir = c.direction || 'long';
+        const currentRefDist = c.refDistance ?? base.refDistance;
+        const currentRefQty = c.refQuantity ?? base.refQuantity;
+        const currentEntry = c.entryPrice ?? base.entryPrice;
+        const currentLev = c.leverage ?? base.leverage;
+        const currentPinned = Array.isArray(c.pinnedDistances) ? c.pinnedDistances : [];
+
+        const longCfg = c.longConfig || {
+          refDistance: activeDir === 'long' ? currentRefDist : currentRefDist,
+          refQuantity: activeDir === 'long' ? currentRefQty : currentRefQty,
+          entryPrice: currentEntry,
+          leverage: currentLev,
+          pinnedDistances: currentPinned,
+        };
+
+        const shortCfg = c.shortConfig || {
+          refDistance: activeDir === 'short' ? currentRefDist : currentRefDist,
+          refQuantity: activeDir === 'short' ? currentRefQty : currentRefQty,
+          entryPrice: currentEntry,
+          leverage: currentLev,
+          pinnedDistances: currentPinned,
+        };
+
+        return {
+          ...base,
+          ...c,
+          direction: activeDir,
+          accountCapital: c.accountCapital ?? 10000,
+          maxMarginPercent: c.maxMarginPercent ?? 20,
+          leverageLimits: c.leverageLimits || DEFAULT_LEVERAGE_ENTRIES,
+          pinnedDistances: currentPinned,
+          longConfig: longCfg,
+          shortConfig: shortCfg,
+        };
+      });
     }
   } catch (err) {
     console.error('Failed to load coins from localStorage:', err);

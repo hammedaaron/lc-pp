@@ -10,6 +10,20 @@ export interface LeverageLimitEntry {
   notes?: string;
 }
 
+export interface DirectionRelativityConfig {
+  refDistance: number;
+  refQuantity: number;
+  entryPrice?: number;
+  leverage?: number;
+  minDistance?: number;
+  maxDistance?: number;
+  stepDistance?: number;
+  distanceUnit?: DistanceUnit;
+  riskUsdt?: number;
+  calculationMode?: CalculationMode;
+  pinnedDistances?: number[];
+}
+
 export interface CoinConfig {
   id: string;
   name: string; // e.g. "BTC"
@@ -47,6 +61,13 @@ export interface CoinConfig {
 
   // Pocket Reference: Maximum Position Size by Leverage
   leverageLimits: LeverageLimitEntry[];
+
+  // Saved relativity values per direction (Long vs Short)
+  longConfig?: DirectionRelativityConfig;
+  shortConfig?: DirectionRelativityConfig;
+
+  // Pinned distance values (e.g. [0.01, 0.02, 0.05])
+  pinnedDistances?: number[];
 
   // Metadata
   createdAt: string;
