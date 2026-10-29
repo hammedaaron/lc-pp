@@ -17,9 +17,9 @@ export default defineConfig(() => {
         includeAssets: ['favicon.ico', 'favicon.png', 'apple-touch-icon.png', 'icon.svg', 'og-cover.png'],
         manifest: {
           id: '/',
-          name: 'FX Crypto Position Planner',
-          short_name: 'FX Planner',
-          description: 'Fast, persistent reference chart and position size calculator for cryptocurrency traders.',
+          name: 'Crypto SL',
+          short_name: 'Crypto SL',
+          description: 'Fast, persistent stop-loss distance reference chart and position size calculator for cryptocurrency traders.',
           start_url: '/',
           scope: '/',
           display: 'standalone',

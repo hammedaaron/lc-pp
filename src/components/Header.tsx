@@ -42,11 +42,11 @@ export const Header: React.FC<HeaderProps> = ({
             <span className="w-3 h-3 rounded-full bg-[#28c840] border border-[#1aab29]/50 inline-block shadow-2xs" />
           </div>
 
-          {/* FX Logo: Silver-White on Black */}
+          {/* Crypto SL Logo: Silver-White on Black */}
           <div className="flex items-center gap-1.5">
             <FXLogo size="sm" />
             <span className="hidden md:inline font-bold text-xs tracking-tight text-neutral-900 dark:text-neutral-100 font-sans">
-              FX <span className="font-normal text-neutral-400">PLANNER</span>
+              Crypto <span className="font-semibold text-neutral-500 dark:text-neutral-400">SL</span>
             </span>
           </div>
 
@@ -107,7 +107,7 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               onClick={onPromptInstall}
               className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-lg bg-black text-white dark:bg-white dark:text-black hover:opacity-90 active:scale-95 transition-all shadow-xs mr-1"
-              title="Install FX Planner App"
+              title="Install Crypto SL App"
               aria-label="Install App"
             >
               <Download className="w-3.5 h-3.5" />

@@ -120,7 +120,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   <FXLogo size="md" />
                   <div>
                     <h4 className="font-semibold text-xs text-[#1d1d1f] dark:text-white leading-tight">
-                      FX Position Planner
+                      Crypto SL
                     </h4>
                     <span className="text-[10px] text-[#86868b] dark:text-[#98989d] flex items-center gap-1">
                       <Wifi className="w-3 h-3 text-[#34c759]" /> Offline PWA Ready
