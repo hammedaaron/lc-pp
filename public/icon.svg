@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Background subtle gradient -->
+    <radialGradient id="bgGrad" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" stop-color="#0a0a0c" />
+      <stop offset="100%" stop-color="#000000" />
+    </radialGradient>
+
+    <!-- Metallic Silver-White Primary Gradient -->
+    <linearGradient id="silverBright" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="22%" stop-color="#F1F5F9" />
+      <stop offset="48%" stop-color="#CBD5E1" />
+      <stop offset="78%" stop-color="#FFFFFF" />
+      <stop offset="100%" stop-color="#94A3B8" />
+    </linearGradient>
+
+    <!-- Metallic Silver Secondary Gradient for Cross-strokes -->
+    <linearGradient id="silverSheen" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#E2E8F0" />
+      <stop offset="35%" stop-color="#94A3B8" />
+      <stop offset="70%" stop-color="#FFFFFF" />
+      <stop offset="100%" stop-color="#CBD5E1" />
+    </linearGradient>
+
+    <!-- Bevel highlight line -->
+    <linearGradient id="silverEdge" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.9" />
+      <stop offset="50%" stop-color="#E2E8F0" stop-opacity="0.6" />
+      <stop offset="100%" stop-color="#64748B" stop-opacity="0.3" />
+    </linearGradient>
+
+    <!-- Subtle glow filter -->
+    <filter id="softGlow" x="-10%" y="-10%" width="120%" height="120%">
+      <feGaussianBlur stdDeviation="8" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Deep Black Canvas -->
+  <rect width="512" height="512" fill="url(#bgGrad)" />
+
+  <!-- Monogram Group with safe scaling -->
+  <g transform="translate(30.72, 30.72) scale(0.88)">
+    <!-- Subtle Ambient Silver Glow under Monogram -->
+    <g opacity="0.25" filter="url(#softGlow)">
+      <!-- F Shadow -->
+      <path d="M 96 128 L 236 128 L 222 174 L 148 174 L 148 234 L 210 234 L 198 276 L 148 276 L 148 384 L 96 384 Z" fill="#E2E8F0" />
+      <!-- X Shadow -->
+      <path d="M 252 128 L 302 128 L 350 232 L 398 128 L 448 128 L 376 270 L 452 384 L 400 384 L 350 298 L 298 384 L 246 384 L 324 256 Z" fill="#E2E8F0" />
+    </g>
+
+    <!-- Main 'F' Monogram -->
+    <!-- Vertical stem + top bar + middle bar with precision aerodynamic cuts -->
+    <path
+      d="M 96 128
+         L 238 128
+         L 220 174
+         L 150 174
+         L 150 232
+         L 214 232
+         L 200 274
+         L 150 274
+         L 150 384
+         L 96 384
+         Z"
+      fill="url(#silverBright)"
+    />
+
+    <!-- 'F' Top edge highlight -->
+    <path
+      d="M 96 128 L 238 128 L 232 134 L 102 134 Z"
+      fill="#FFFFFF"
+      opacity="0.9"
+    />
+
+    <!-- Main 'X' Monogram -->
+    <!-- Backward stroke: top-right to bottom-left -->
+    <path
+      d="M 398 128
+         L 448 128
+         L 298 384
+         L 248 384
+         Z"
+      fill="url(#silverSheen)"
+    />
+
+    <!-- Forward stroke: top-left to bottom-right with crisp bevel crossing -->
+    <path
+      d="M 252 128
+         L 302 128
+         L 350 228
+         L 398 128
+         L 448 128
+         L 376 266
+         L 452 384
+         L 402 384
+         L 350 294
+         L 298 384
+         L 248 384
+         L 326 256
+         Z"
+      fill="url(#silverBright)"
+    />
+
+    <!-- Inner crossing highlight on X -->
+    <path
+      d="M 334 242 L 366 242 L 382 272 L 350 272 Z"
+      fill="#FFFFFF"
+      opacity="0.35"
+    />
+
+    <!-- Precision Subtitle / Geometric Accent Line -->
+    <rect x="96" y="404" width="356" height="4" rx="2" fill="url(#silverBright)" opacity="0.8" />
+    <circle cx="96" cy="406" r="3" fill="#FFFFFF" />
+    <circle cx="452" cy="406" r="3" fill="#FFFFFF" />
+  </g>
+</svg>

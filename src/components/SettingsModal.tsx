@@ -3,8 +3,9 @@ import { CoinConfig, TableRowData } from '../types';
 import { exportTableToCsv, downloadFile } from '../utils/storage';
 import { 
   X, Moon, Sun, Save, FileDown, Database, Upload, Download, 
-  Check, Sliders, DollarSign, RefreshCw 
+  Check, Sliders, DollarSign, RefreshCw, Smartphone, Share2, CheckCircle2, Wifi
 } from 'lucide-react';
+import { FXLogo } from './FXLogo';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -20,6 +21,10 @@ interface SettingsModalProps {
   onToggleDarkMode: () => void;
   onUpdateCoin: (changes: Partial<CoinConfig>) => void;
   onImportCoins: (imported: CoinConfig[]) => void;
+  isInstallable?: boolean;
+  isInstalled?: boolean;
+  isIOS?: boolean;
+  onPromptInstall?: () => void;
 }
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({
@@ -36,7 +41,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   onToggleDarkMode,
   onUpdateCoin,
   onImportCoins,
+  isInstallable = false,
+  isInstalled = false,
+  isIOS = false,
+  onPromptInstall,
 }) => {
+
   if (!isOpen) return null;
 
   const [jsonInput, setJsonInput] = useState('');
@@ -99,8 +109,66 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
         {/* Content Body */}
         <div className="p-4 space-y-4 overflow-y-auto text-xs text-[#1d1d1f] dark:text-[#f5f5f7]">
+          {/* Application & PWA Card */}
+          <div className="space-y-2">
+            <span className="text-[10px] font-semibold text-[#86868b] dark:text-[#98989d] uppercase tracking-wider">
+              Application &amp; Offline
+            </span>
+            <div className="bg-[#fbfbfd] dark:bg-[#2c2c2e] border border-black/[0.06] dark:border-white/[0.08] rounded-xl p-3 space-y-2.5">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <FXLogo size="md" />
+                  <div>
+                    <h4 className="font-semibold text-xs text-[#1d1d1f] dark:text-white leading-tight">
+                      FX Position Planner
+                    </h4>
+                    <span className="text-[10px] text-[#86868b] dark:text-[#98989d] flex items-center gap-1">
+                      <Wifi className="w-3 h-3 text-[#34c759]" /> Offline PWA Ready
+                    </span>
+                  </div>
+                </div>
+
+                {isInstalled ? (
+                  <span className="inline-flex items-center gap-1 text-[11px] font-medium text-[#34c759] bg-[#34c759]/10 px-2.5 py-0.5 rounded-full">
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    <span>Installed</span>
+                  </span>
+                ) : isInstallable && onPromptInstall ? (
+                  <button
+                    type="button"
+                    onClick={onPromptInstall}
+                    className="inline-flex items-center gap-1 text-xs font-medium text-white bg-black dark:bg-white dark:text-black px-2.5 py-1 rounded-lg hover:opacity-90 active:scale-95 transition-all shadow-xs"
+                  >
+                    <Smartphone className="w-3.5 h-3.5" />
+                    <span>Install App</span>
+                  </button>
+                ) : (
+                  <span className="text-[10px] text-[#86868b] dark:text-[#98989d] font-mono">
+                    v1.2 PWA
+                  </span>
+                )}
+              </div>
+
+              {/* iOS instructions if on Apple device */}
+              {isIOS && !isInstalled && (
+                <div className="p-2.5 rounded-lg bg-black/[0.03] dark:bg-white/[0.05] border border-black/[0.05] dark:border-white/[0.08] text-[11px] space-y-1">
+                  <p className="font-medium text-[#1d1d1f] dark:text-white flex items-center gap-1">
+                    <Share2 className="w-3.5 h-3.5 text-[#0071e3] dark:text-[#0a84ff]" />
+                    Install on iOS / Safari:
+                  </p>
+                  <ol className="list-decimal list-inside text-[#6e6e73] dark:text-[#a1a1a6] space-y-0.5 pl-0.5">
+                    <li>Tap the <strong>Share</strong> button in Safari</li>
+                    <li>Select <strong>Add to Home Screen</strong></li>
+                    <li>Launch full-screen from your Home Screen</li>
+                  </ol>
+                </div>
+              )}
+            </div>
+          </div>
+
           {/* Appearance & Preferences */}
           <div className="space-y-2">
+
             <span className="text-[10px] font-semibold text-[#86868b] dark:text-[#98989d] uppercase tracking-wider">
               Preferences
             </span>

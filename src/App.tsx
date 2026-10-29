@@ -14,6 +14,8 @@ import { ReferenceTable } from './components/ReferenceTable';
 import { SettingsModal } from './components/SettingsModal';
 import { CoinModal } from './components/CoinModal';
 import { DeleteConfirmModal } from './components/DeleteConfirmModal';
+import { OfflineIndicator } from './components/OfflineIndicator';
+import { usePWAInstall } from './hooks/usePWAInstall';
 
 export default function App() {
   const [coins, setCoins] = useState<CoinConfig[]>(() => loadSavedCoins());
@@ -22,6 +24,10 @@ export default function App() {
   const [autoSaveEnabled, setAutoSaveEnabled] = useState<boolean>(true);
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
+
+  // PWA Install & Offline
+  const { isInstallable, isInstalled, isIOS, promptInstall } = usePWAInstall();
+
 
   // Dark Mode State
   const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
@@ -242,6 +248,9 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[#f5f5f7] dark:bg-[#000000] text-[#1d1d1f] dark:text-[#f5f5f7] flex flex-col font-sans antialiased transition-colors">
+      {/* Offline Status Notice */}
+      <OfflineIndicator />
+
       {/* Uncluttered Header */}
       <Header
         activeCoin={activeCoin}
@@ -252,6 +261,9 @@ export default function App() {
         sidebarOpen={sidebarOpen}
         onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
         onManualSave={handleManualSave}
+        isInstallable={isInstallable}
+        isInstalled={isInstalled}
+        onPromptInstall={promptInstall}
       />
 
       {/* Main Container */}
@@ -320,7 +332,12 @@ export default function App() {
         onToggleDarkMode={toggleDarkMode}
         onUpdateCoin={handleUpdateActiveCoin}
         onImportCoins={handleImportCoins}
+        isInstallable={isInstallable}
+        isInstalled={isInstalled}
+        isIOS={isIOS}
+        onPromptInstall={promptInstall}
       />
+
 
       {/* New / Edit Coin Modal */}
       <CoinModal

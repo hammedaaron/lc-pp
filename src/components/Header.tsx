@@ -1,6 +1,7 @@
 import React from 'react';
 import { CoinConfig } from '../types';
-import { Settings, Moon, Sun, Layers, Check, Save } from 'lucide-react';
+import { Settings, Moon, Sun, Layers, Check, Download } from 'lucide-react';
+import { FXLogo } from './FXLogo';
 
 interface HeaderProps {
   activeCoin: CoinConfig;
@@ -11,6 +12,9 @@ interface HeaderProps {
   sidebarOpen: boolean;
   onToggleSidebar: () => void;
   onManualSave?: () => void;
+  isInstallable?: boolean;
+  onPromptInstall?: () => void;
+  isInstalled?: boolean;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -22,11 +26,14 @@ export const Header: React.FC<HeaderProps> = ({
   sidebarOpen,
   onToggleSidebar,
   onManualSave,
+  isInstallable = false,
+  onPromptInstall,
+  isInstalled = false,
 }) => {
   return (
     <header className="bg-[#fbfbfd]/90 dark:bg-[#1c1c1e]/90 backdrop-blur-md border-b border-black/[0.08] dark:border-white/[0.08] sticky top-0 z-30">
       <div className="max-w-7xl mx-auto px-3 sm:px-4 h-12 flex items-center justify-between gap-2">
-        {/* Left: Window Controls, Mobile Coin Drawer Toggle & App Identity */}
+        {/* Left: Window Controls, FX Logo & Coin Identity */}
         <div className="flex items-center gap-2 sm:gap-3">
           {/* macOS Window dots (desktop only) */}
           <div className="hidden lg:flex items-center gap-1.5 mr-1" aria-hidden="true">
@@ -35,14 +42,22 @@ export const Header: React.FC<HeaderProps> = ({
             <span className="w-3 h-3 rounded-full bg-[#28c840] border border-[#1aab29]/50 inline-block shadow-2xs" />
           </div>
 
+          {/* FX Logo: Silver-White on Black */}
+          <div className="flex items-center gap-1.5">
+            <FXLogo size="sm" />
+            <span className="hidden md:inline font-bold text-xs tracking-tight text-neutral-900 dark:text-neutral-100 font-sans">
+              FX <span className="font-normal text-neutral-400">PLANNER</span>
+            </span>
+          </div>
+
           {/* Mobile Coins Button */}
           <button
             onClick={onToggleSidebar}
-            className="p-2 -ml-1 rounded-lg hover:bg-black/5 dark:hover:bg-white/10 text-[#6e6e73] dark:text-[#a1a1a6] hover:text-[#1d1d1f] dark:hover:text-white transition-colors flex items-center gap-1.5 min-h-[44px] min-w-[44px] justify-center"
+            className="p-1.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/10 text-[#6e6e73] dark:text-[#a1a1a6] hover:text-[#1d1d1f] dark:hover:text-white transition-colors flex items-center gap-1.5 min-h-[36px] justify-center border border-black/5 dark:border-white/10"
             title="Toggle Coins"
             aria-label="Coins List"
           >
-            <Layers className="w-4 h-4" />
+            <Layers className="w-3.5 h-3.5" />
             <span className="text-xs font-semibold text-[#1d1d1f] dark:text-white font-mono">
               {activeCoin.name}
             </span>
@@ -65,6 +80,7 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
         </div>
 
+
         {/* Center: Save state indicator */}
         <div className="flex items-center">
           {hasUnsavedChanges ? (
@@ -84,8 +100,21 @@ export const Header: React.FC<HeaderProps> = ({
           )}
         </div>
 
-        {/* Right: Dark Mode Toggle & Settings Icon */}
+        {/* Right: Install App, Dark Mode Toggle & Settings Icon */}
         <div className="flex items-center gap-1">
+          {/* PWA Install Button (shows when installable) */}
+          {isInstallable && !isInstalled && onPromptInstall && (
+            <button
+              onClick={onPromptInstall}
+              className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-lg bg-black text-white dark:bg-white dark:text-black hover:opacity-90 active:scale-95 transition-all shadow-xs mr-1"
+              title="Install FX Planner App"
+              aria-label="Install App"
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline font-sans">Install App</span>
+            </button>
+          )}
+
           {/* Quick Dark Mode Toggle */}
           <button
             onClick={onToggleDarkMode}
@@ -114,3 +143,4 @@ export const Header: React.FC<HeaderProps> = ({
     </header>
   );
 };
+
